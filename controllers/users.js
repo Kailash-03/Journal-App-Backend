@@ -15,7 +15,7 @@ export const isAuthorized = async (req,res,next)=>{
         })
     }
 
-    const userid = jwt.decode(token,process.env.process.env.secret_key);
+    const userid = jwt.decode(token,process.env.secret_key);
 
     req.user = await User.findById(userid);
     next();

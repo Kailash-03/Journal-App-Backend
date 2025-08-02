@@ -4,6 +4,7 @@ import { config } from "dotenv";
 import cookieParser from "cookie-parser";
 import userRouter from "./routes/userroutes.js";
 import entryRouter from "./routes/entryRoutes.js";
+import cors from "cors";
 
 export const app = express(); 
 

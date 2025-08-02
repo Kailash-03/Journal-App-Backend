@@ -19,6 +19,14 @@ const schema  = mongoose.Schema({
         type:"Number",
         default:0,
     },
+    sentimentScore: {
+        type: "Number", 
+        default:0,
+    },
+    mood:{
+        type:"String",
+        default:"neutral",
+    },
     user: {
         type: mongoose.Schema.Types.ObjectId,
         ref: "User",

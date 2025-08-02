@@ -1,28 +1,111 @@
+import { raw } from "express";
 import { journal } from "../models/journal.js";
 import {normalizeToStartOfDay} from "./utils.js";
+import Sentiment from "sentiment";
 
 // yet to add jwt hashing and all for userid 
-export const createNewEntry = async (req,res)=>{
-  const {brief,description,date,score} = req.body;  
-  const normalisedDate = normalizeToStartOfDay(date);
-  const prevEntry = await journal.findOne({user: req.user._id,date:normalisedDate});
+export const createNewEntry = async (req, res) => {
+  const { brief, description, date, score } = req.body;
 
-  if(prevEntry)
-  {
-    return res.status(400).json({
-            status:"false",
-            message:"Journal entry already exists for this date"
-    })
+  // Validate and normalize date
+  let normalizedDate;
+  if (date) {
+    normalizedDate = normalizeToStartOfDay(date);
+    if (isNaN(new Date(normalizedDate))) {
+      return res.status(400).json({
+        status: "false",
+        message: "Invalid date format"
+      });
+    }
+  } else {
+    normalizedDate = normalizeToStartOfDay(new Date());
   }
-  const entry = await  journal.create({
-    brief,description,date:normalisedDate,score,user:req.user._id
+
+  const prevEntry = await journal.findOne({ user: req.user._id, date: normalizedDate });
+
+  if (prevEntry) {
+    return res.status(400).json({
+      status: "false",
+      message: "Journal entry already exists for this date"
+    });
+  }
+  const textToAnalyze = brief + " " + description;
+  const sentiment = new Sentiment();
+  const sentimentScore = sentiment.analyze(textToAnalyze);
+  let raw = sentimentScore.score;
+
+  raw = Math.max(-10, Math.min(10, raw));
+  const normalizedScore = ((raw + 10) / 20) * 10;
+
+  let mood;
+  if(normalisedScore >= 8) {
+    mood = "happy";
+  }else if(normalisedScore >= 3) {
+    mood = "neutral";
+  } else {
+    mood = "sad";
+  }
+
+  const entry = await journal.create({
+    brief,
+    description,
+    date: normalizedDate,
+    score,
+    sentimentScore: normalizedScore,
+    mood,
+    user: req.user._id
   });
 
   return res.status(201).json({
-    status:"true",
-    message:"journal entry created successfully"
-  })
+    status: "true",
+    message: "journal entry created successfully"
+  });
 }
+
+export const getEntriesByDateRange = async (req, res) => {
+  let { startDate, endDate } = req.body;
+
+  // Normalize and validate dates
+  startDate = normalizeToStartOfDay(startDate);
+  endDate = normalizeToStartOfDay(endDate);
+
+  if (!startDate || !endDate) {
+    return res.status(400).json({
+      status: false,
+      message: "Invalid or missing startDate/endDate"
+    });
+  }
+
+  // Include the whole end day
+  const endOfDay = new Date(endDate);
+  endOfDay.setUTCHours(23, 59, 59, 999);
+
+  const entries = await journal.find({
+    user: req.user._id,
+    date: { $gte: startDate, $lte: endOfDay }
+  }).sort({ date: 1 });
+
+  if (!entries.length) {
+    return res.status(400).json({
+      status: "false",
+      message: "No Journal entry exists for this user in the given range"
+    });
+  }
+
+  const graphData = entries.map(entry => ({
+    date: entry.date.toISOString().split('T')[0],
+    score: entry.score,
+    sentimentScore: entry.sentimentScore,
+    mood: entry.mood
+  }));
+
+  return res.status(200).json({
+    status: true,
+    message: "Entries Fetched Successfully",
+    data: graphData
+  });
+};
+
 
 export const getMySpecificEntry = async (req,res)=>{
 
@@ -50,7 +133,7 @@ export const getMySpecificEntry = async (req,res)=>{
 
 
 export const getAllMyEntries = async (req,res)=>{
-  const entries = await journal.find({user:req.user._id});
+  const entries = await journal.find({user:req.user._id}).sort({date:1});
 
   if(!entries)
   {
@@ -60,11 +143,18 @@ export const getAllMyEntries = async (req,res)=>{
     })
   }
 
+  const graphData = entries.map(entry => ({
+    date: entry.date.toISOString().split('T')[0],
+    score: entry.score,
+    sentimentScore: entry.sentimentScore,
+    mood: entry.mood
+  }));
+
   return res.status(200).json(
     {
       status:true,
       message:"Entry Fetched Successfully",
-      entries: entries
+      data:graphData
     }
   )
 }
