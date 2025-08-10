@@ -5,6 +5,7 @@ export const getStartOfTodayDate = ()=>{
 
 export function normalizeToStartOfDay(inputDate) {
   const d = new Date(inputDate);
+  if (isNaN(d)) return null; // Return null for invalid dates
   return new Date(Date.UTC(d.getUTCFullYear(), d.getUTCMonth(), d.getUTCDate()));
 }
 

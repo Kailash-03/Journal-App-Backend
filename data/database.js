@@ -2,7 +2,7 @@ import e from 'express'
 import mongoose from 'mongoose'
 
 export const connectDB = async() => {
-    mongoose.connect("mongodb://localhost:27017",{
+    mongoose.connect(process.env.mongo_url,{
         dbName:"Journal",
     }).then(
         console.log("DB connected successfully")
