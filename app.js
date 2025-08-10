@@ -16,7 +16,8 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
 app.use(cors({
-    origin: process.env.node_env === "Devlopment" ? "http://localhost:5173" : "https://your-production-url.com",
+    origin: "http://localhost:5173",
+    methods: ["GET", "POST", "PUT", "DELETE"],
     credentials: true,
 }));    
 app.use("/api/v1/user", userRouter);
