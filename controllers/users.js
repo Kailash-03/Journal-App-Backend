@@ -126,20 +126,22 @@ export const getUserDetails = (req,res)=>{
     })
 };
 
-export const logoutUser = (req,res)=>{
+export const logoutUser = (req, res) => {
     try {
-        return res.status(200).cookie("token","",{
-            expires:new Date(Date.now()),
-            httpOnly:true
+        return res.status(200).cookie("token", "", {
+            expires: new Date(0),
+            httpOnly: true,
+            secure: true,         // <-- match login/signup
+            sameSite: "none",     // <-- match login/signup
         }).json({
-            status:true,
-            message:"logged out successfully"
-        })
+            status: true,
+            message: "logged out successfully"
+        });
     } catch (error) {
         console.log(error);
         return res.status(500).json({
-            status:"false",
-            message:"internal server error"}
-        )
+            status: "false",
+            message: "internal server error"
+        });
     }
 }
