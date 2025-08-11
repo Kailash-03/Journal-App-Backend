@@ -50,9 +50,11 @@ export const loginUser = async (req,res)=>{
         }
 
         token = jwt.sign({ _id: user._id }, process.env.secret_key);
-        return res.status(200).cookie("token",token,{
-            httpOnly:true,
-            maxAge:15*60*1000
+        return res.status(200).cookie("token", token, {
+            httpOnly: true,
+            secure: true,
+            sameSite: "none",
+            maxAge: 15 * 60 * 1000
         }).json({
             status:"true",
             message:"user logged in succesfully"
@@ -99,6 +101,8 @@ export const createNewUser = async (req,res)=>{
         .status(200)
         .cookie("token",token,{
             httpOnly:true,
+            secure: true,
+            sameSite: "none",
         })
         .json({
             status:"true",
