@@ -54,7 +54,7 @@ export const loginUser = async (req,res)=>{
             httpOnly: true,
             secure: true,
             sameSite: "none",
-            maxAge: 15 * 60 * 1000
+            maxAge: 24 * 60 * 60 * 1000
         }).json({
             status:"true",
             message:"user logged in succesfully"
@@ -103,6 +103,7 @@ export const createNewUser = async (req,res)=>{
             httpOnly:true,
             secure: true,
             sameSite: "none",
+            maxAge: 24* 60 * 60 * 1000 // 1 day in milliseconds
         })
         .json({
             status:"true",
@@ -131,8 +132,8 @@ export const logoutUser = (req, res) => {
         return res.status(200).cookie("token", "", {
             expires: new Date(0),
             httpOnly: true,
-            secure: true,         // <-- match login/signup
-            sameSite: "none",     // <-- match login/signup
+            secure: true,         
+            sameSite: "none",     
         }).json({
             status: true,
             message: "logged out successfully"
