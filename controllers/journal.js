@@ -144,6 +144,8 @@ export const getAllMyEntries = async (req,res)=>{
   }
 
   const graphData = entries.map(entry => ({
+    brief: entry.brief,
+    description: entry.description,
     date: entry.date.toISOString().split('T')[0],
     score: entry.score,
     sentimentScore: entry.sentimentScore,
