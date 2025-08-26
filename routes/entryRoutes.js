@@ -8,11 +8,11 @@ const router = express.Router();
 
 //journal
 router.post("/createEntry",isAuthorized,createNewEntry);
-router.post("/getMySpecificEntry",isAuthorized,getMySpecificEntry);
 router.get("/getAllMyEntries",isAuthorized,getAllMyEntries);
 router.get("/getgraphByDate",isAuthorized,getEntriesByDateRange); // Assuming this is the correct endpoint for graph data
 
 router.route("/:id")
+.get(isAuthorized,getMySpecificEntry)
 .put(isAuthorized,updateEntry)
 .delete(isAuthorized,deleteEntry);
 

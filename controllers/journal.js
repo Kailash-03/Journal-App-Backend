@@ -126,24 +126,21 @@ export const getEntriesByDateRange = async (req, res) => {
 
 export const getMySpecificEntry = async (req, res) => {
   try {
-    let { date } = req.body;
-    date = normalizeToStartOfDay(date);
-    const jentry = await journal.findOne({ date, user: req.user._id });
+    const { id } = req.params; // Get entry id from route params
+    const jentry = await journal.findOne({ _id: id, user: req.user._id });
 
     if (!jentry) {
-      return res.status(400).json({
+      return res.status(404).json({
         status: "false",
-        message: "No Journal entry exists for this date"
+        message: "No Journal entry exists for this id"
       });
     }
 
-    return res.status(200).json(
-      {
-        status: true,
-        message: "Entry Fetched Successfully",
-        entry: jentry
-      }
-    );
+    return res.status(200).json({
+      status: true,
+      message: "Entry Fetched Successfully",
+      entry: jentry
+    });
   } catch (error) {
     console.error("Error in getMySpecificEntry:", error);
     console.trace();
