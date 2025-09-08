@@ -72,7 +72,7 @@ export const createNewEntry = async (req, res) => {
 
 export const getEntriesByDateRange = async (req, res) => {
   try {
-    let { startDate, endDate } = req.params;
+    let { startDate, endDate } = req.query;
 
     // Normalize and validate dates
     startDate = normalizeToStartOfDay(startDate);

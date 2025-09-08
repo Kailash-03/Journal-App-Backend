@@ -9,7 +9,7 @@ const router = express.Router();
 //journal
 router.post("/createEntry",isAuthorized,createNewEntry);
 router.get("/getAllMyEntries",isAuthorized,getAllMyEntries);
-router.get("/getEntriesByDateRange",isAuthorized,getEntriesByDateRange); // Assuming this is the correct endpoint for graph data
+router.get("/getEntriesByDateRange",isAuthorized,getEntriesByDateRange); // Using query parameters
 
 router.route("/:id")
 .get(isAuthorized,getMySpecificEntry)
